@@ -6,6 +6,17 @@ import pool from '../config/db'
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' })
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' })
+    }
+
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password)) {
+      return res.status(400).json({ message: 'Password must contain uppercase and lowercase letters' })
+    }
     const hashedPassword = await bcrypt.hash(password, 10)
     const result = await pool.query(
       'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
