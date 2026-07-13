@@ -5,9 +5,10 @@ import pool from '../config/db'
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' })
+    const { email, password, name } = req.body
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ message: 'Email, password and restaurant name are required' })
     }
 
     if (password.length < 8) {
@@ -17,12 +18,27 @@ export const register = async (req: Request, res: Response) => {
     if (!/[A-Z]/.test(password) || !/[a-z]/.test(password)) {
       return res.status(400).json({ message: 'Password must contain uppercase and lowercase letters' })
     }
+
     const hashedPassword = await bcrypt.hash(password, 10)
-    const result = await pool.query(
+
+    const userResult = await pool.query(
       'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
       [email, hashedPassword]
     )
-    res.status(201).json({ message: 'User created', user: result.rows[0] })
+
+    const user = userResult.rows[0]
+
+    const restaurantResult = await pool.query(
+      'INSERT INTO restaurants (name, owner_id) VALUES ($1, $2) RETURNING id, name',
+      [name, user.id]
+    )
+
+    res.status(201).json({
+      message: 'User and restaurant created',
+      user: user,
+      restaurant: restaurantResult.rows[0]
+    })
+
   } catch (error) {
     res.status(500).json({ message: 'Server error' })
   }
