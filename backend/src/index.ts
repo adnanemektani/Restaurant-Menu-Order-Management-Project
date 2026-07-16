@@ -9,7 +9,8 @@ app.use(express.json())
 
 import authRoutes from './routes/authRoutes'
 app.use('/api/auth', authRoutes)
-
+import menuRoutes from './routes/menuRoutes'
+app.use('/api/menu', menuRoutes)
 const port = process.env.PORT || 5000
 
 app.get('/', (req, res) => {
