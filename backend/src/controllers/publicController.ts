@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import pool from '../config/db'
 import { io } from '../index'
+import ActivityLog from '../models/ActivityLog'
 
 export const getPublicMenu = async (req: Request, res: Response) => {
   try {
@@ -29,7 +30,7 @@ export const createOrder = async (req: Request, res: Response) => {
   try {
     const { restaurant_id, table_number, items } = req.body
 
-    const total = items.reduce((sum: number, item: any) => 
+    const total = items.reduce((sum: number, item: any) =>
       sum + (item.price * item.quantity), 0
     )
 
@@ -48,6 +49,11 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     io.emit('newOrder', order)
+    await ActivityLog.create({
+      action: 'new_order',
+      user_id: Number(restaurant_id),
+      details: { order_id: order.id, table_number, total }
+    })
 
     res.status(201).json(order)
   } catch (error) {

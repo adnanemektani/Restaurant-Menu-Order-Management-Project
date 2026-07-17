@@ -10,6 +10,7 @@ import tableRoutes from './routes/tableRoutes'
 import publicRoutes from './routes/publicRoutes'
 import orderRoutes from './routes/orderRoutes'
 import analyticsRoutes from './routes/analyticsRoutes'
+import logRoutes from './routes/logRoutes'
 import pool from './config/db'
 
 dotenv.config()
@@ -39,6 +40,7 @@ app.use('/api/tables', tableRoutes)
 app.use('/api/public', publicRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/analytics', analyticsRoutes)
+app.use('/api/logs', logRoutes)
 
 const port = process.env.PORT || 5000
 
