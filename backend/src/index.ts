@@ -13,6 +13,8 @@ import menuRoutes from './routes/menuRoutes'
 app.use('/api/menu', menuRoutes)
 import tableRoutes from './routes/tableRoutes'
 app.use('/api/tables', tableRoutes)
+import publicRoutes from './routes/publicRoutes'
+app.use('/api/public', publicRoutes)
 
 const port = process.env.PORT || 5000
 
