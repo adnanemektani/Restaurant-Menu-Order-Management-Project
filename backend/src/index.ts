@@ -1,31 +1,49 @@
 import express from 'express'
 import mongoose from 'mongoose'
-import {Pool} from 'pg'
+import { Pool } from 'pg'
 import dotenv from 'dotenv'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import authRoutes from './routes/authRoutes'
+import menuRoutes from './routes/menuRoutes'
+import tableRoutes from './routes/tableRoutes'
+import publicRoutes from './routes/publicRoutes'
+import orderRoutes from './routes/orderRoutes'
+import pool from './config/db'
+
 dotenv.config()
 
 const app = express()
 app.use(express.json())
 
-import authRoutes from './routes/authRoutes'
-app.use('/api/auth', authRoutes)
-import menuRoutes from './routes/menuRoutes'
-app.use('/api/menu', menuRoutes)
-import tableRoutes from './routes/tableRoutes'
-app.use('/api/tables', tableRoutes)
-import publicRoutes from './routes/publicRoutes'
-app.use('/api/public', publicRoutes)
-
-const port = process.env.PORT || 5000
-
 app.get('/', (req, res) => {
   res.send('Server is running!')
 })
 
+const httpServer = createServer(app)
+export const io = new Server(httpServer, {
+  cors: { origin: '*' }
+})
+
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id)
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id)
+  })
+})
+
+app.use('/api/auth', authRoutes)
+app.use('/api/menu', menuRoutes)
+app.use('/api/tables', tableRoutes)
+app.use('/api/public', publicRoutes)
+app.use('/api/orders', orderRoutes)
+
+const port = process.env.PORT || 5000
+
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/restaurant-saas')
   .then(() => {
     console.log('Connected to MongoDB')
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
       console.log(`Server is running on port ${port}`)
     })
   })
@@ -33,15 +51,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/restaurant-
     console.error('MongoDB connection error:', error)
   })
 
-const pool = new Pool({
-  host: process.env.PG_HOST || 'localhost',
-  port: parseInt(process.env.PG_PORT || '5432', 10),
-  user: process.env.PG_USER || 'postgres',
-  password: process.env.PG_PASSWORD || '',
-  database: process.env.PG_DATABASE || 'restaurant_saas',
-})
 pool.connect()
-    .then(() => console.log('Connected to PostgreSQL'))
-    .catch((error: unknown) => console.error('PostgreSQL connection error:', error))
+  .then(() => console.log('Connected to PostgreSQL'))
+  .catch((error: unknown) => console.error('PostgreSQL connection error:', error))
 
 export { app, pool }

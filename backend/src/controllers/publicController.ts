@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import pool from '../config/db'
+import { io } from '../index'
 
 export const getPublicMenu = async (req: Request, res: Response) => {
   try {
@@ -45,6 +46,8 @@ export const createOrder = async (req: Request, res: Response) => {
         [order.id, item.menu_item_id, item.quantity, item.price]
       )
     }
+
+    io.emit('newOrder', order)
 
     res.status(201).json(order)
   } catch (error) {
