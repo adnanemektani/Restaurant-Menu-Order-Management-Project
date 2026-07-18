@@ -6,6 +6,7 @@ import Analytics from './pages/Analytics'
 import Menu from './pages/Menu'
 import Tables from './pages/Tables'
 import PublicMenu from './pages/PublicMenu'
+import OrderStatus from './pages/OrderStatus'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/menu" element={<Menu />} />
         <Route path="/tables" element={<Tables />} />
         <Route path="/menu/:restaurantId/:tableId" element={<PublicMenu />} />
+        <Route path="/order/:orderId" element={<OrderStatus />} />
       </Routes>
     </BrowserRouter>
   )

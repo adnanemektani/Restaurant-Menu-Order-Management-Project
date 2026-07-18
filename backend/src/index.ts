@@ -12,10 +12,16 @@ import orderRoutes from './routes/orderRoutes'
 import analyticsRoutes from './routes/analyticsRoutes'
 import logRoutes from './routes/logRoutes'
 import pool from './config/db'
+import cors from 'cors'
+
 
 dotenv.config()
 
 const app = express()
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}))
 app.use(express.json())
 
 app.get('/', (req, res) => {

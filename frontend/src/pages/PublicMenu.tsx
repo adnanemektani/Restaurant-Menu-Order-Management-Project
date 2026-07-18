@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+
 
 interface Category {
   id: number
@@ -30,7 +31,7 @@ export default function PublicMenu() {
   const [items, setItems] = useState<MenuItem[]>([])
   const [cart, setCart] = useState<CartItem[]>([])
   const [ordered, setOrdered] = useState(false)
-
+  const navigate = useNavigate()
   useEffect(() => {
     axios.get(`http://localhost:5000/api/public/menu/${restaurantId}/${tableId}`)
       .then(res => {
@@ -60,18 +61,17 @@ export default function PublicMenu() {
   const total = cart.reduce((sum, c) => sum + c.price * c.quantity, 0).toFixed(2)
 
   const placeOrder = async () => {
-    await axios.post('http://localhost:5000/api/public/orders', {
-      restaurant_id: parseInt(restaurantId!),
-      table_number: parseInt(tableId!),
-      items: cart.map(c => ({
-        menu_item_id: c.menu_item_id,
-        quantity: c.quantity,
-        price: c.price
-      }))
-    })
-    setOrdered(true)
-    setCart([])
-  }
+  const res = await axios.post('http://localhost:5000/api/public/orders', {
+    restaurant_id: parseInt(restaurantId!),
+    table_number: parseInt(tableId!),
+    items: cart.map(c => ({
+      menu_item_id: c.menu_item_id,
+      quantity: c.quantity,
+      price: c.price
+    }))
+  })
+  navigate(`/order/${res.data.id}`)
+}
 
   if (ordered) return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f5ede0' }}>
