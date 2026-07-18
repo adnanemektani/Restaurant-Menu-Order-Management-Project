@@ -4,20 +4,23 @@ import { io } from '../index'
 import ActivityLog from '../models/ActivityLog'
 
 export const getOrders = async (req: any, res: Response) => {
-    try {
-        const restaurant = await pool.query(
-            'SELECT id FROM restaurants WHERE owner_id = $1',
-            [req.user.id]
-        )
-        const restaurantId = restaurant.rows[0].id
-        const result = await pool.query(
-            'SELECT * FROM orders WHERE restaurant_id = $1 ORDER BY created_at DESC',
-            [restaurantId]
-        )
-        res.json(result.rows)
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' })
-    }
+  try {
+    const restaurant = await pool.query(
+      'SELECT id FROM restaurants WHERE owner_id = $1',
+      [req.user.id]
+    )
+    const restaurantId = restaurant.rows[0].id
+    const result = await pool.query(
+      `SELECT * FROM orders 
+       WHERE restaurant_id = $1 
+       AND DATE(created_at) = CURRENT_DATE
+       ORDER BY created_at DESC`,
+      [restaurantId]
+    )
+    res.json(result.rows)
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' })
+  }
 }
 
 export const updateOrderStatus = async (req: any, res: Response) => {
