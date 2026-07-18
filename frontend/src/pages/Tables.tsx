@@ -83,6 +83,48 @@ export default function Tables() {
             </button>
           </div>
         </div>
+        {/* Print All QR */}
+{tables.length > 0 && (
+  <div className="flex justify-end mb-4">
+    <button
+      onClick={() => {
+        const printWindow = window.open('', '_blank')
+        if (!printWindow) return
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>QR Codes - Restaurant</title>
+              <style>
+                body { font-family: serif; background: #f5ede0; padding: 20px; }
+                .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+                .card { border: 2px solid #3b1f0f; border-radius: 16px; padding: 20px; text-align: center; background: white; }
+                .card h2 { font-size: 20px; margin-bottom: 10px; color: #3b1f0f; }
+                .card img { width: 150px; height: 150px; }
+                @media print { body { background: white; } }
+              </style>
+            </head>
+            <body>
+              <h1 style="text-align:center; color:#3b1f0f; margin-bottom:30px;">Restaurant QR Codes</h1>
+              <div class="grid">
+                ${tables.map(t => `
+                  <div class="card">
+                    <h2>Table ${t.table_number}</h2>
+                    <img src="${t.qr_code_url}" />
+                  </div>
+                `).join('')}
+              </div>
+            </body>
+          </html>
+        `)
+        printWindow.document.close()
+        printWindow.print()
+      }}
+      className="px-6 py-2 rounded-xl font-semibold text-amber-100 transition-all"
+      style={{ backgroundColor: '#3b1f0f' }}>
+       Print All QR Codes
+    </button>
+  </div>
+)}
 
         {/* Tables Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
