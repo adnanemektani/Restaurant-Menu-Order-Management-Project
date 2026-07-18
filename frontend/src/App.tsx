@@ -7,6 +7,7 @@ import Menu from './pages/Menu'
 import Tables from './pages/Tables'
 import PublicMenu from './pages/PublicMenu'
 import OrderStatus from './pages/OrderStatus'
+import { Navigate } from 'react-router-dom'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/tables" element={<Tables />} />
         <Route path="/menu/:restaurantId/:tableId" element={<PublicMenu />} />
         <Route path="/order/:orderId" element={<OrderStatus />} />
+        <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   )
